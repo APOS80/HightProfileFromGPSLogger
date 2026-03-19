@@ -1,13 +1,13 @@
-# Imports a CVS from a Columbus P-10 Pro GPS-Logger, calculates a hight profile showing it with matplotlib.
+# Imports a CVS from a Columbus P-10 Pro GPS-Logger, calculates a height profile showing it with matplotlib.
 # Example files in the map "CSV"
 
 import csv
 import math
 import numpy
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import matplotlib.ticker
 
-# För utritning i plan
+# To draw plane coordinates
 from shapely.geometry import LineString
 import geopandas as gpd
 
@@ -15,14 +15,14 @@ import geopandas as gpd
 # For raw data
 rows = []
 
-# For calcuation
+# For calculation
 dandh = []
 
 # Average Earth radius in meters
 R = 6371000.0
 
 # Load a CSV file
-with open("CSV/13141948.CSV", newline='') as csvfile:
+with open("CSV/13153001.CSV", newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for row in reader:
         rows.append(row)
@@ -73,11 +73,22 @@ for row in dandh[:5]:print(row)
 distance = numpy.array([value[0] for value in dandh])
 elevation = numpy.array([value[1] for value in dandh])
 
+# Make subplot
+fig, (ax1, ax2) = plt.subplots(1, 2
+                               , layout='constrained')
+
+fig.suptitle('Height profile and path')
+
 # Visualise the data
-ax1 = matplotlib.pyplot.plot(distance, elevation)
+ax1.plot(distance, elevation)
 
 # Draw plane
 coords = [(float(row[5]), float(row[4])) for row in rows[1:]]
 gdf = gpd.GeoDataFrame(geometry=[LineString(coords)], crs="EPSG:4326")
-ax2 = gdf.plot()
-matplotlib.pyplot.show()
+gdf.plot(ax=ax2)
+
+
+ax2.relim()
+ax2.autoscale_view()
+
+plt.show()
